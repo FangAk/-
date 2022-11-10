@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .box {
+        width: 50vw;
+        height: 50vh;
+        margin: 500px auto;
+    }
+</style>
+
+<body>
+    <div class="box">
+    </div>
+    <button onclick="play()">开始录制</button>
+</body>
+<script>
+
+
+    //开启摄像头
+    const video = document.createElement('video');
+    video.autoplay = true;
+    video.muted = true;
+    video.playsinline = true;
+    video.style.width = '100%';
+    video.style.height = '100%';
+    document.querySelector('.box').appendChild(video);
+
+    const constraints = {
+        audio: true,
+        video: {
+            width: 1280,
+            height: 720
+        }
+    };
+
+    navigator.mediaDevices.getUserMedia(constraints).then(stream => {
+        video.srcObject = stream;
+    });
+
+
+    //录制
+    let recorder = null;
+    let chunks = [];
+    let blob = null;
+
+    function play() {
+        recorder = new MediaRecorder(video.srcObject);
+        recorder.ondataavailable = e => {
+            chunks.push(e.data);
+        };
+        recorder.onstop = e => {
+            blob = new Blob(chunks, {
+                type: 'video/mp4'
+            });
+            chunks = [];
+            const videoURL = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.download = 'test.mp4';
+            a.href = videoURL;
+            a.click();
+        };
+        recorder.start();
+        setTimeout(() => {
+            recorder.stop();
+        }, 10000);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+</html>
